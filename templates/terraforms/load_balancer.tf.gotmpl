@@ -1,0 +1,103 @@
+resource "aws_lb" "lb" {
+  ip_address_type = "ipv4"
+  name            = "sk-lb"
+  security_groups = [
+  {{- if .SecurityGroup.PublicId }}
+    var.security_group_public_id,
+  {{- else}}
+    aws_security_group.public.id,
+  {{- end}}
+  ]
+  subnets = [
+  {{- if .Subnet.Subnet1Id }}
+    var.subnet_1_id,
+  {{- else}}
+    aws_subnet.az_1.id,
+  {{- end}}
+  {{- if .Subnet.Subnet2Id }}
+    var.subnet_2_id,
+  {{- else}}
+    aws_subnet.az_2.id,
+  {{- end}}
+  ]
+
+  tags = {}
+}
+
+resource "aws_lb_listener" "lb_listener_80" {
+  load_balancer_arn = aws_lb.lb.arn
+  port              = 80
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.blue.arn
+  }
+
+  tags = {}
+}
+
+resource "aws_lb_listener" "lb_listener_8080" {
+  load_balancer_arn = aws_lb.lb.arn
+  port              = 8080
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.blue.arn
+  }
+
+  tags = {}
+}
+
+resource "aws_lb_target_group" "blue" {
+  name        = "sk-tg-blue"
+  port        = 80
+  protocol    = "HTTP"
+  target_type = "ip"
+{{- if .Vpc.Id }}
+  vpc_id      = var.vpc_id
+{{- else}}
+  vpc_id      = aws_vpc.vpc.id
+{{- end}}
+
+  health_check {
+    healthy_threshold   = 5
+    matcher             = "200"
+    path                = "/"
+    unhealthy_threshold = 2
+  }
+
+  stickiness {
+    enabled = false
+    type    = "lb_cookie"
+  }
+
+  tags = {}
+}
+
+resource "aws_lb_target_group" "green" {
+  name        = "sk-tg-green"
+  port        = 80
+  protocol    = "HTTP"
+  target_type = "ip"
+{{- if .Vpc.Id }}
+  vpc_id      = var.vpc_id
+{{- else}}
+  vpc_id      = aws_vpc.vpc.id
+{{- end}}
+
+  health_check {
+    healthy_threshold   = 5
+    matcher             = "200"
+    path                = "/"
+    unhealthy_threshold = 2
+  }
+
+  stickiness {
+    enabled = false
+    type    = "lb_cookie"
+  }
+
+  tags = {}
+}
+
+# Made by Shouka

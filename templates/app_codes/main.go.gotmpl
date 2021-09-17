@@ -1,0 +1,26 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+)
+
+func main() {
+	startTime := time.Now()
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Receive a request")
+		res := fmt.Sprintf(
+			"Hello world\nSTART: %s\nCURRENT: %s\n",
+			startTime.Format(time.RFC3339),
+			time.Now().Format(time.RFC3339),
+		)
+		w.Write([]byte(res))
+	})
+
+	port := ":80"
+	log.Println("Running at " + port)
+	log.Fatal(http.ListenAndServe(port, nil))
+}

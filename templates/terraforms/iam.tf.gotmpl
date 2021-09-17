@@ -1,0 +1,61 @@
+{{ if not .Iam.EcsTaskExecutionArn -}}
+resource "aws_iam_role" "ecs_task_execution" {
+  assume_role_policy = jsonencode(
+    {
+      Statement = [
+        {
+          Action = "sts:AssumeRole"
+          Effect = "Allow"
+          Principal = {
+            Service = "ecs-tasks.amazonaws.com"
+          }
+          Sid = ""
+        },
+      ]
+      Version = "2008-10-17"
+    }
+  )
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+  ]
+  max_session_duration = 3600
+  name                 = "sk-EcsTaskExecutionRole"
+  path                 = "/"
+
+  inline_policy {}
+
+  tags = {}
+}
+
+{{ end -}}
+{{ if not .Iam.CodedeployArn -}}
+resource "aws_iam_role" "codedeploy" {
+  assume_role_policy = jsonencode(
+    {
+      Statement = [
+        {
+          Action = "sts:AssumeRole"
+          Effect = "Allow"
+          Principal = {
+            Service = "codedeploy.amazonaws.com"
+          }
+          Sid = ""
+        },
+      ]
+      Version = "2012-10-17"
+    }
+  )
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS",
+  ]
+  max_session_duration = 3600
+  name                 = "sk-CodeDeployRole"
+  path                 = "/"
+
+  inline_policy {}
+
+  tags = {}
+}
+
+{{ end -}}
+# Made by Shouka

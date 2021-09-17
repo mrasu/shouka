@@ -1,0 +1,65 @@
+variable "aws_region" {
+  default = "{{.Region}}"
+}
+
+variable "availability_zones" {
+  default = ["{{.AvailabilityZone.Zone1}}", "{{.AvailabilityZone.Zone2}}"]
+}
+
+{{if .CloudWatch.GroupName -}}
+variable "cloud_watch_log_group_name" {
+  default = "{{.CloudWatch.GroupName}}"
+}
+
+{{end -}}
+
+{{if and .Ecr.RepositoryUrl .Ecr.Tag -}}
+variable "ecr_image" {
+  description = "URL for image storing at ECR"
+  default = "{{.Ecr.RepositoryUrl}}:{{.Ecr.Tag}}"
+}
+
+{{end -}}
+{{if .Iam.CodedeployArn -}}
+variable "iam_role_codedeploy_arn" {
+  description = "ARN for role to execute Codedeploy"
+  default = "{{.Iam.CodedeployArn}}"
+}
+
+{{end -}}
+{{if .Iam.EcsTaskExecutionArn -}}
+variable "iam_role_ecs_task_execution_arn" {
+  description = "ARN for role to execute ecs' tasks"
+  default = "{{.Iam.EcsTaskExecutionArn}}"
+}
+
+{{end -}}
+{{if .SecurityGroup.PublicId -}}
+variable "security_group_public_id" {
+  description = "Id for SecurityGroup accessible from public internet"
+  default = "{{.SecurityGroup.PublicId}}"
+}
+
+{{end -}}
+{{if .Subnet.Subnet1Id -}}
+variable "subnet_1_id" {
+  description = "Id for Subnet"
+  default = "{{.Subnet.Subnet1Id}}"
+}
+
+{{end -}}
+{{if .Subnet.Subnet2Id -}}
+variable "subnet_2_id" {
+  description = "Id for Subnet"
+  default = "{{.Subnet.Subnet2Id}}"
+}
+
+{{end -}}
+{{if .Vpc.Id -}}
+variable "vpc_id" {
+  description = "Id for Vpc"
+  default = "{{.Vpc.Id}}"
+}
+
+{{end -}}
+# Made by Shouka

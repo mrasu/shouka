@@ -1,0 +1,35 @@
+{{ if not .Subnet.Subnet1Id -}}
+resource "aws_subnet" "az_1" {
+  availability_zone       = var.availability_zones[0]
+  cidr_block              = "172.31.0.0/20"
+  map_public_ip_on_launch = true
+{{- if .Vpc.Id }}
+  vpc_id                  = var.vpc_id
+{{- else}}
+  vpc_id                  = aws_vpc.vpc.id
+{{- end}}
+
+  tags = {
+    Name = "sk-Az1Subnet"
+  }
+}
+
+{{ end -}}
+{{ if not .Subnet.Subnet2Id -}}
+resource "aws_subnet" "az_2" {
+  availability_zone       = var.availability_zones[1]
+  cidr_block              = "172.31.16.0/20"
+  map_public_ip_on_launch = true
+{{- if .Vpc.Id }}
+  vpc_id                  = var.vpc_id
+{{- else}}
+  vpc_id                  = aws_vpc.vpc.id
+{{- end}}
+
+  tags = {
+    Name = "sk-Az2Subnet"
+  }
+}
+
+{{ end -}}
+# Made by Shouka
