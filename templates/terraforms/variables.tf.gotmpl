@@ -13,38 +13,65 @@ variable "cloud_watch_log_group_name" {
 
 {{end -}}
 
-{{if and .Ecr.RepositoryUrl .Ecr.Tag -}}
+{{if .Ecr.RepositoryUrl -}}
 variable "ecr_image" {
   description = "URL for image storing at ECR"
-  default = "{{.Ecr.RepositoryUrl}}:{{.Ecr.Tag}}"
+  default     = "{{.Ecr.RepositoryUrl}}:{{.Ecr.Tag}}"
 }
 
 {{end -}}
 {{if .Iam.CodedeployArn -}}
 variable "iam_role_codedeploy_arn" {
   description = "ARN for role to execute Codedeploy"
-  default = "{{.Iam.CodedeployArn}}"
+  default     = "{{.Iam.CodedeployArn}}"
 }
 
 {{end -}}
 {{if .Iam.EcsTaskExecutionArn -}}
 variable "iam_role_ecs_task_execution_arn" {
   description = "ARN for role to execute ecs' tasks"
-  default = "{{.Iam.EcsTaskExecutionArn}}"
+  default     = "{{.Iam.EcsTaskExecutionArn}}"
+}
+
+{{end -}}
+{{if .Iam.GithubActionsArn -}}
+variable "iam_role_github_actions_arn" {
+  description = "ARN for role to be used by GitHub Actions"
+  default     = "{{.Iam.GithubActionsArn}}"
+}
+
+{{end -}}
+{{if .Iam.GithubActionsOpenidProviderArn -}}
+variable "iam_openid_provider_github_actions_arn" {
+  description = "ARN for identity provider for GitHub Actions' OpenID Connect"
+  default     = "{{.Iam.GithubActionsOpenidProviderArn}}"
+}
+
+{{else -}}
+variable "iam_github_actions_provider_client_ids" {
+  description = "Client ids for identity provider for GitHub Actions"
+  default     = ["https://github.com/{{.GithubRepository}}"]
+}
+
+{{end -}}
+{{if not .Iam.GithubActionsArn -}}
+variable "iam_github_actions_role_vstoken_string_like" {
+  description = "Value to be compared with a request context for GitHub Actions' OpenID Connect"
+  default     = "repo:{{.GithubRepository}}:ref:refs/heads/main"
 }
 
 {{end -}}
 {{if .SecurityGroup.PublicId -}}
 variable "security_group_public_id" {
   description = "Id for SecurityGroup accessible from public internet"
-  default = "{{.SecurityGroup.PublicId}}"
+  default     = "{{.SecurityGroup.PublicId}}"
 }
 
 {{end -}}
 {{if .Subnet.Subnet1Id -}}
 variable "subnet_1_id" {
   description = "Id for Subnet"
-  default = "{{.Subnet.Subnet1Id}}"
+  default     = "{{.Subnet.Subnet1Id}}"
 }
 
 {{end -}}

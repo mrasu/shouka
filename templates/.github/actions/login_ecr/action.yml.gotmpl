@@ -1,0 +1,16 @@
+name: "Login ECR"
+description: "Action to login AWS ECR"
+inputs:
+  region:
+    required: true
+    description: "Region of AWS"
+  server:
+    required: true
+    description: "ECR server"
+runs:
+  using: "composite"
+  steps:
+    - name: Login ECR
+      run: |
+        aws ecr get-login-password --region ${{"{{"}}inputs.region{{"}}"}} | docker login --username AWS --password-stdin ${{"{{"}}inputs.server{{"}}"}}
+      shell: bash

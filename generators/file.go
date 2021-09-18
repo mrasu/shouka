@@ -1,12 +1,14 @@
 package generators
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"path"
 	"text/template"
+
+	"github.com/pkg/errors"
 )
 
 type file struct {
@@ -15,6 +17,20 @@ type file struct {
 
 func newFile(fs *embed.FS) *file {
 	return &file{fs: fs}
+}
+
+func (f *file) loadTemplate(tmplDir, filename string, data interface{}) (*bytes.Buffer, error) {
+	tmpl, err := f.load(tmplDir, filename)
+	if err != nil {
+		return nil, err
+	}
+
+	writer := bytes.Buffer{}
+	if err := tmpl.Execute(&writer, data); err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("failed to write template: %s", filename))
+	}
+
+	return &writer, nil
 }
 
 func (f *file) load(tmplDir, name string) (*template.Template, error) {

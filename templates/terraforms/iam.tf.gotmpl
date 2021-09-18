@@ -58,4 +58,59 @@ resource "aws_iam_role" "codedeploy" {
 }
 
 {{ end -}}
+
+{{ if not .Iam.GithubActionsOpenidProviderArn -}}
+resource "aws_iam_openid_connect_provider" "github_actions" {
+  url = "https://vstoken.actions.githubusercontent.com"
+
+  client_id_list = var.iam_github_actions_provider_client_ids
+
+  thumbprint_list = [
+    "a031c46782e6e6c662c2c87c76da9aa62ccabd8e",
+  ]
+
+  tags = {}
+}
+
+{{ end -}}
+
+{{ if not .Iam.GithubActionsArn -}}
+resource "aws_iam_role" "github_actions" {
+  assume_role_policy = jsonencode(
+    {
+      Statement = [
+        {
+          Action = "sts:AssumeRoleWithWebIdentity"
+          Condition = {
+            StringLike = {
+              "vstoken.actions.githubusercontent.com:sub" = var.iam_github_actions_role_vstoken_string_like
+            }
+          }
+          Effect = "Allow"
+          Principal = {
+          {{- if .Iam.GithubActionsOpenidProviderArn }}
+            Federated = var.iam_openid_provider_github_actions_arn
+          {{- else }}
+            Federated = "${aws_iam_openid_connect_provider.github_actions.arn}"
+          {{- end }}
+          }
+        },
+      ]
+      Version = "2008-10-17"
+    }
+  )
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AWSCodeDeployDeployerAccess",
+    "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS",
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
+  ]
+  max_session_duration = 3600
+  name                 = "GitHubActionRole"
+  path                 = "/"
+  tags                 = {}
+
+  inline_policy {}
+}
+
+{{ end -}}
 # Made by Shouka

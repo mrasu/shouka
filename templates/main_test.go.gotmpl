@@ -1,0 +1,17 @@
+package main
+
+import (
+	"testing"
+	"time"
+)
+
+func TestFormatTime(t *testing.T) {
+	utc, _ := time.LoadLocation("UTC")
+	d := time.Date(2001, 1, 2, 3, 4, 5, 6, utc)
+
+	formatted := formatTime(d)
+	expectation := "2001-01-02T03:04:05Z"
+	if formatted != expectation {
+		t.Errorf("failed to format date. expected: %v, actual: %v", formatted, expectation)
+	}
+}

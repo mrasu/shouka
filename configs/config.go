@@ -1,7 +1,7 @@
 package configs
 
 type Config struct {
-	Directory      string
-	CreatesAppCode bool
-	Resources      ResourceConfig
+	Directory        string         `json:"directory"`
+	GithubRepository string         `json:"github_repository"`
+	Resources        ResourceConfig `json:"resources"`
 }

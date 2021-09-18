@@ -1,7 +1,7 @@
 package configs
 
 type CloudWatchConfig struct {
-	GroupName string
+	GroupName string `json:"group_name"`
 }
 
 func (cwc *CloudWatchConfig) RequiresTemplate() bool {

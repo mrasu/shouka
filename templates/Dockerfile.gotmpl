@@ -1,0 +1,8 @@
+FROM golang:1.17.0-alpine
+
+WORKDIR /go/src/app
+COPY main.go main.go
+
+RUN go build -ldflags "-X 'main.builtAt=$(TZ=utc date '+%Y-%m-%dT%H:%M:%SZ')'" -o $GOPATH/bin/start_server main.go
+
+CMD ["start_server"]

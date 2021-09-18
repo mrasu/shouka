@@ -2,72 +2,83 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
+	"fmt"
 	"log"
 
-	"github.com/mrasu/shouka/cli"
-
+	"github.com/mrasu/shouka/cmd"
 	"github.com/mrasu/shouka/configs"
-
-	"github.com/mrasu/shouka/generators"
+	"github.com/mrasu/shouka/injections"
 )
 
+// Embed subdirectories explicitly to include hidden files like .gitignore.gotmpl
 //go:embed templates/*
+//go:embed templates/terraforms/*
 var embedFs embed.FS
 
 func main() {
-	cnf, err := cli.AskConfig()
-	if err != nil {
+	injections.EmbedFs = &embedFs
+
+	// runDummy()
+
+	//*
+	if err := cmd.Execute(); err != nil {
 		log.Fatalf("%+v", err)
 	}
-
-	/*
-		cnf := &configs.Config{
-			// Directory: fmt.Sprintf("tmp/tmp_terraform_%s", time.Now().Format("20060102150405")),
-			Directory: "shouka_gen",
-			Resources: configs.ResourceConfig{
-				Region: "ap-northeast-1",
-				AvailabilityZone: configs.AvailabilityZoneConfig{
-					Zone1: "ap-northeast-1a",
-					Zone2: "ap-northeast-1c",
-				},
-				CloudWatch: configs.CloudWatchConfig{
-					GroupName: "",
-				},
-				Ecr: configs.EcrConfig{
-					RepositoryUrl: "",
-					Tag:           "",
-				},
-				Iam: configs.IamConfig{
-					EcsTaskExecutionArn: "",
-					CodedeployArn:       "",
-				},
-				SecurityGroup: configs.SecurityGroupConfig{
-					PublicId: "",
-				},
-				Subnet: configs.SubnetConfig{
-					Subnet1Id: "",
-					Subnet2Id: "",
-				},
-				Vpc: configs.VpcConfig{
-					Id: "",
-				},
-			},
-		}
-	*/
-
-	if err := generate(cnf); err != nil {
-		log.Fatalf("%+v", err)
-	}
+	//*/
 }
 
-func generate(cnf *configs.Config) error {
-	// if _, err := os.Stat(dir); err == nil {
-	// 	panic("already exists")
-	// }
-	//
-	// if err := os.MkdirAll(dir, 0755); err != nil {
-	// 	panic(err)
-	// }
-	g := generators.NewGenerator(&embedFs, cnf)
-	return g.Generate()
+func runDummy() {
+	cnf := &configs.Config{
+		// Directory: fmt.Sprintf("tmp/tmp_terraform_%s", time.Now().Format("20060102150405")),
+		Directory:        "tmp/dummy_shouka_gen",
+		GithubRepository: "mrasu/shouka_gen",
+		Resources: configs.ResourceConfig{
+			AwsAccountId: "889435949642",
+			Region:       "ap-northeast-1",
+			AvailabilityZone: configs.AvailabilityZoneConfig{
+				Zone1: "ap-northeast-1a",
+				Zone2: "ap-northeast-1c",
+			},
+			CloudWatch: configs.CloudWatchConfig{
+				GroupName: "",
+			},
+			Ecr: configs.EcrConfig{
+				RepositoryUrl: "",
+				Tag:           "",
+			},
+			Iam: configs.IamConfig{
+				EcsTaskExecutionArn: "",
+				CodedeployArn:       "",
+
+				GithubActionsArn:               "b",
+				GithubActionsOpenidProviderArn: "c",
+			},
+			SecurityGroup: configs.SecurityGroupConfig{
+				PublicId: "a",
+			},
+			Subnet: configs.SubnetConfig{
+				Subnet1Id: "1",
+				Subnet2Id: "2",
+			},
+			Vpc: configs.VpcConfig{
+				Id: "",
+			},
+		},
+	}
+
+	fmt.Println(cnf)
+	data, err := json.Marshal(cnf)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%s\n", string(data))
+
+	v := configs.Config{}
+	err = json.Unmarshal(data, &v)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(&v)
 }

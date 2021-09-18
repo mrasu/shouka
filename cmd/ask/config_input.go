@@ -1,4 +1,4 @@
-package cli
+package ask
 
 import (
 	survey "github.com/AlecAivazis/survey/v2"
@@ -7,8 +7,8 @@ import (
 )
 
 type configAnswer struct {
-	Directory      string
-	CreatesAppCode bool
+	Directory        string
+	GithubRepository string
 }
 
 func AskConfig() (*configs.Config, error) {
@@ -20,11 +20,11 @@ func AskConfig() (*configs.Config, error) {
 				Message: "Tell directory to shouka generate codes",
 				Default: "shouka_gen",
 			},
-		},
-		{
-			Name: "CreatesAppCode",
-			Prompt: &survey.Confirm{
-				Message: "Create sample codes for Docker?",
+		}, {
+			Name: "GithubRepository",
+			Prompt: &survey.Input{
+				Message: "Tell repository of GitHub you use",
+				Help:    "e.g. \"mrasu/shouka\"",
 			},
 		},
 	}
@@ -34,7 +34,7 @@ func AskConfig() (*configs.Config, error) {
 	}
 
 	cnf.Directory = ans.Directory
-	cnf.CreatesAppCode = ans.CreatesAppCode
+	cnf.GithubRepository = ans.GithubRepository
 
 	rCnf, err := AskResources()
 	if err != nil {

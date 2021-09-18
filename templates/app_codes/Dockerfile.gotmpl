@@ -1,8 +1,0 @@
-FROM golang:1.17.0-alpine
-
-WORKDIR /go/src/app
-COPY main.go main.go
-
-RUN go build -o $GOPATH/bin/start_server main.go
-
-CMD ["start_server"]

@@ -20,18 +20,18 @@ resource "aws_ecs_task_definition" "run_server" {
         cpu         = 0
         environment = []
         essential   = true
-      {{- if and .Ecr.RepositoryUrl .Ecr.Tag }}
+      {{- if and .Ecr.RepositoryUrl }}
         image       = var.ecr_image
       {{- else }}
-        image       = "${aws_ecr_repository.ecr_repository.repository_url}:latest"
+        image       = "${aws_ecr_repository.ecr_repository.repository_url}:{{.Ecr.Tag}}"
       {{- end }}
         logConfiguration = {
           logDriver = "awslogs"
           options = {
           {{- if .CloudWatch.GroupName }}
-            awslogs-group         = var.cloud_watch_log_group_name
+            awslogs-group = var.cloud_watch_log_group_name
           {{- else}}
-            awslogs-group         =  aws_cloudwatch_log_group.ecs_logs.name
+            awslogs-group = aws_cloudwatch_log_group.ecs_logs.name
           {{- end}}
 
             awslogs-region        = var.aws_region
@@ -57,7 +57,7 @@ resource "aws_ecs_task_definition" "run_server" {
 {{- else}}
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
 {{- end}}
-  family             = "sk-task"
+  family             = "{{.Ecs.DefaultTaskFamilyName}}"
   memory             = "512"
   network_mode       = "awsvpc"
   requires_compatibilities = [

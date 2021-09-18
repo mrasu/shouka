@@ -9,6 +9,7 @@ import (
 type Generator struct {
 	file   *file
 	config *configs.Config
+	data   *data
 }
 
 func NewGenerator(fs *embed.FS, config *configs.Config) *Generator {
@@ -19,13 +20,21 @@ func NewGenerator(fs *embed.FS, config *configs.Config) *Generator {
 }
 
 func (g *Generator) Generate() error {
-	if g.config.CreatesAppCode {
-		if err := NewAppCodeGenerator(g.file, g.config).Generate(); err != nil {
-			return err
-		}
+	if err := ensureDirectoryExistence(g.config.Directory); err != nil {
+		return err
 	}
 
-	if err := NewTfGenerator(g.file, g.config).Generate(); err != nil {
+	data := newData(g.config)
+
+	if err := NewAppCodeGenerator(g.file, g.config).Generate(data); err != nil {
+		return err
+	}
+
+	if err := NewTfGenerator(g.file, g.config).Generate(data); err != nil {
+		return err
+	}
+
+	if err := NewGhActionsGenerator(g.file, g.config).Generate(data); err != nil {
 		return err
 	}
 
