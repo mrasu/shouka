@@ -2,6 +2,7 @@ package generators
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/mrasu/shouka/configs"
 )
@@ -23,6 +24,7 @@ type data struct {
 type resourcesData struct {
 	SkPrefix         string
 	Region           string
+	GithubOwner      string
 	GithubRepository string
 	AvailabilityZone availabilityZoneData
 	CloudWatch       cloudWatchData
@@ -101,6 +103,7 @@ func newResourceData(config *configs.Config) resourcesData {
 	return resourcesData{
 		SkPrefix:         config.SkPrefix,
 		Region:           config.Resources.Region,
+		GithubOwner:      extractGithubOwner(config.GithubRepository),
 		GithubRepository: config.GithubRepository,
 		AvailabilityZone: availabilityZoneData{
 			Zone1: config.Resources.AvailabilityZone.Zone1,
@@ -179,6 +182,10 @@ func newAppCodeData(config *configs.Config) appCodeData {
 
 func addSkPrefix(config *configs.Config, name string) string {
 	return config.SkPrefix + "-" + name
+}
+
+func extractGithubOwner(repoName string) string {
+	return strings.SplitN(repoName, "/", 2)[0]
 }
 
 func getEcrTag(config *configs.Config) string {

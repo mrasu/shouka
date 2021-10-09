@@ -50,7 +50,7 @@ variable "iam_openid_provider_github_actions_arn" {
 {{else -}}
 variable "iam_github_actions_provider_client_ids" {
   description = "Client ids for identity provider for GitHub Actions"
-  default     = ["https://github.com/{{.GithubRepository}}"]
+  default     = ["https://github.com/{{.GithubOwner}}"]
 }
 
 {{end -}}
