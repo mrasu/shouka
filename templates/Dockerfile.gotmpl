@@ -1,8 +1,13 @@
-FROM golang:1.17.0-alpine
+FROM golang:1.17.0-alpine AS builder
 
 WORKDIR /go/src/app
 COPY main.go main.go
 
-RUN go build -ldflags "-X 'main.builtAt=$(TZ=utc date '+%Y-%m-%dT%H:%M:%SZ')'" -o $GOPATH/bin/start_server main.go
+RUN go build -ldflags "-X 'main.builtAt=$(TZ=utc date '+%Y-%m-%dT%H:%M:%SZ')'" -o start_server main.go
 
-CMD ["start_server"]
+FROM alpine:3.13
+
+WORKDIR /root/
+COPY --from=builder /go/src/app/start_server ./
+
+CMD ["./start_server"]
