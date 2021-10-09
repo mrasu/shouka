@@ -3,7 +3,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "sk-VPC"
+    Name = "{{.SkPrefix}}-VPC"
   }
 }
 
@@ -28,7 +28,7 @@ resource "aws_default_route_table" "default_route_table" {
   propagating_vgws = []
 
   tags = {
-    Name = "sk-DefaultRouteTable"
+    Name = "{{.SkPrefix}}-DefaultRouteTable"
   }
 }
 
@@ -36,7 +36,7 @@ resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "sk-InternetGateway"
+    Name = "{{.SkPrefix}}-InternetGateway"
   }
 }
 
@@ -47,7 +47,7 @@ resource "aws_vpc_dhcp_options" "vpc_dhcp_options" {
   ]
 
   tags = {
-    Name = "sk-DHCPOptions"
+    Name = "{{.SkPrefix}}-DHCPOptions"
   }
 }
 
@@ -94,7 +94,7 @@ resource "aws_vpc_endpoint" "vpc_endpoint_ecr_api" {
   vpc_id            = aws_vpc.vpc.id
 
   tags = {
-    Name = "sk-EcrApiEndpoint"
+    Name = "{{.SkPrefix}}-EcrApiEndpoint"
   }
 }
 
@@ -136,7 +136,7 @@ resource "aws_vpc_endpoint" "vpc_endpoint_ecr_dkr" {
   vpc_id            = aws_vpc.vpc.id
 
   tags = {
-    Name = "sk-EcrDkrEndpoint"
+    Name = "{{.SkPrefix}}-EcrDkrEndpoint"
   }
 }
 
@@ -178,7 +178,7 @@ resource "aws_vpc_endpoint" "vpc_endpoint_logs" {
   vpc_id            = aws_vpc.vpc.id
 
   tags = {
-    Name = "sk-LogsEndpoint"
+    Name = "{{.SkPrefix}}-LogsEndpoint"
   }
 }
 
@@ -204,7 +204,7 @@ resource "aws_vpc_endpoint" "vpc_endpoint_s3" {
   vpc_id       = aws_vpc.vpc.id
 
   tags = {
-    Name = "sk-S3Endpoint"
+    Name = "{{.SkPrefix}}-S3Endpoint"
   }
 }
 

@@ -3,7 +3,7 @@ resource "aws_ecs_cluster" "cluster" {
     "FARGATE",
     "FARGATE_SPOT",
   ]
-  name = "sk-cluster"
+  name = "{{.SkPrefix}}-cluster"
 
   setting {
     name  = "containerInsights"
@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "run_server" {
           }
         }
         mountPoints = []
-        name        = "sk-container"
+        name        = "{{.SkPrefix}}-container"
         portMappings = [
           {
             containerPort = 80
@@ -57,7 +57,7 @@ resource "aws_ecs_task_definition" "run_server" {
 {{- else}}
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
 {{- end}}
-  family             = "{{.Ecs.DefaultTaskFamilyName}}"
+  family             = "{{.SkPrefix}}-{{.Ecs.DefaultTaskFamilyName}}"
   memory             = "512"
   network_mode       = "awsvpc"
   requires_compatibilities = [
@@ -81,7 +81,7 @@ resource "aws_ecs_service" "http_servers" {
   enable_execute_command             = false
   health_check_grace_period_seconds  = 0
   launch_type                        = "FARGATE"
-  name                               = "sk-service"
+  name                               = "{{.SkPrefix}}-service"
   platform_version                   = "1.4.0"
   task_definition                    = aws_ecs_task_definition.run_server.arn
 
@@ -90,7 +90,7 @@ resource "aws_ecs_service" "http_servers" {
   }
 
   load_balancer {
-    container_name   = "sk-container"
+    container_name   = "{{.SkPrefix}}-container"
     container_port   = 80
     target_group_arn = aws_lb_target_group.blue.arn
   }

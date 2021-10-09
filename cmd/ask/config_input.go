@@ -9,6 +9,7 @@ import (
 type configAnswer struct {
 	Directory        string
 	GithubRepository string
+	SkPrefix         string
 }
 
 func AskConfig() (*configs.Config, error) {
@@ -20,7 +21,15 @@ func AskConfig() (*configs.Config, error) {
 				Message: "Tell directory to shouka generate codes",
 				Default: "shouka_gen",
 			},
-		}, {
+		},
+		{
+			Name: "SkPrefix",
+			Prompt: &survey.Input{
+				Message: "Tell prefix for new resources' name",
+				Default: "sk",
+			},
+		},
+		{
 			Name: "GithubRepository",
 			Prompt: &survey.Input{
 				Message: "Tell repository of GitHub you use",
@@ -35,6 +44,7 @@ func AskConfig() (*configs.Config, error) {
 
 	cnf.Directory = ans.Directory
 	cnf.GithubRepository = ans.GithubRepository
+	cnf.SkPrefix = ans.SkPrefix
 
 	rCnf, err := AskResources()
 	if err != nil {

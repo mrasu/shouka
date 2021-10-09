@@ -1,6 +1,6 @@
 resource "aws_lb" "lb" {
   ip_address_type = "ipv4"
-  name            = "sk-lb"
+  name            = "{{.SkPrefix}}-lb"
   security_groups = [
   {{- if .SecurityGroup.PublicId }}
     var.security_group_public_id,
@@ -49,7 +49,7 @@ resource "aws_lb_listener" "lb_listener_8080" {
 }
 
 resource "aws_lb_target_group" "blue" {
-  name        = "sk-tg-blue"
+  name        = "{{.SkPrefix}}-tg-blue"
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
@@ -75,7 +75,7 @@ resource "aws_lb_target_group" "blue" {
 }
 
 resource "aws_lb_target_group" "green" {
-  name        = "sk-tg-green"
+  name        = "{{.SkPrefix}}-tg-green"
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"

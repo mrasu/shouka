@@ -1,6 +1,6 @@
 resource "aws_codedeploy_app" "codedeploy_app" {
   compute_platform = "ECS"
-  name             = "sk-application"
+  name             = "{{.SkPrefix}}-application"
 
   tags = {}
 }
@@ -8,7 +8,7 @@ resource "aws_codedeploy_app" "codedeploy_app" {
 resource "aws_codedeploy_deployment_group" "blue_green_deploy_group" {
   app_name               = aws_codedeploy_app.codedeploy_app.name
   deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
-  deployment_group_name  = "sk-deployment-group"
+  deployment_group_name  = "{{.SkPrefix}}-deployment-group"
 {{- if .Iam.CodedeployArn }}
   service_role_arn       = var.iam_role_codedeploy_arn
 {{- else}}

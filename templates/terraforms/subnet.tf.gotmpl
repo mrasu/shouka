@@ -10,7 +10,7 @@ resource "aws_subnet" "az_1" {
 {{- end}}
 
   tags = {
-    Name = "sk-Az1Subnet"
+    Name = "{{.SkPrefix}}-Az1Subnet"
   }
 }
 
@@ -27,7 +27,7 @@ resource "aws_subnet" "az_2" {
 {{- end}}
 
   tags = {
-    Name = "sk-Az2Subnet"
+    Name = "{{.SkPrefix}}-Az2Subnet"
   }
 }
 

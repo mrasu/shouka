@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "ecr_repository" {
-  name = "{{.Ecr.DefaultRepositoryName}}"
+  name = "{{.SkPrefix}}-{{.Ecr.DefaultRepositoryName}}"
 
   tags = {}
 }

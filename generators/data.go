@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	DefaultEcrRepositoryName             = "sk-repository"
+	DefaultEcrRepositoryName             = "repository"
 	DefaultEcrTagName                    = "production"
-	DefaultEcsTaskName                   = "sk-task"
-	DefaultCodeDeployApplicationName     = "sk-application"
-	DefaultCodeDeployDeploymentGroupName = "sk-deployment-group"
+	DefaultEcsTaskName                   = "task"
+	DefaultCodeDeployApplicationName     = "application"
+	DefaultCodeDeployDeploymentGroupName = "deployment-group"
 )
 
 type data struct {
@@ -21,6 +21,7 @@ type data struct {
 }
 
 type resourcesData struct {
+	SkPrefix         string
 	Region           string
 	GithubRepository string
 	AvailabilityZone availabilityZoneData
@@ -84,6 +85,7 @@ type ghActionsData struct {
 }
 
 type appCodeData struct {
+	SkPrefix                 string
 	AwsTaskDefinitionExample string
 }
 
@@ -97,6 +99,7 @@ func newData(config *configs.Config) *data {
 
 func newResourceData(config *configs.Config) resourcesData {
 	return resourcesData{
+		SkPrefix:         config.SkPrefix,
 		Region:           config.Resources.Region,
 		GithubRepository: config.GithubRepository,
 		AvailabilityZone: availabilityZoneData{
@@ -136,8 +139,8 @@ func newResourceData(config *configs.Config) resourcesData {
 func newGhActionsData(config *configs.Config) ghActionsData {
 	data := ghActionsData{
 		AwsEcrTag:              getEcrTag(config),
-		AwsApplicationName:     DefaultCodeDeployApplicationName,
-		AwsDeploymentGroupName: DefaultCodeDeployDeploymentGroupName,
+		AwsApplicationName:     addSkPrefix(config, DefaultCodeDeployApplicationName),
+		AwsDeploymentGroupName: addSkPrefix(config, DefaultCodeDeployDeploymentGroupName),
 	}
 
 	if config.Resources.Iam.GithubActionsArn == "" && config.Resources.AwsAccountId != "" {
@@ -148,7 +151,7 @@ func newGhActionsData(config *configs.Config) ghActionsData {
 		if config.Resources.AwsAccountId != "" {
 			data.AwsEcrRegistry = fmt.Sprintf("%s.dkr.ecr.%s.amazonaws.com", config.Resources.AwsAccountId, config.Resources.Region)
 		}
-		data.AwsEcrRepository = DefaultEcrRepositoryName
+		data.AwsEcrRepository = addSkPrefix(config, DefaultEcrRepositoryName)
 	} else {
 		if config.Resources.Ecr.RepositoryDomain() != "" {
 			data.AwsEcrRegistry = config.Resources.Ecr.RepositoryDomain()
@@ -163,13 +166,19 @@ func newGhActionsData(config *configs.Config) ghActionsData {
 
 func newAppCodeData(config *configs.Config) appCodeData {
 	return appCodeData{
+		SkPrefix: config.SkPrefix,
 		AwsTaskDefinitionExample: fmt.Sprintf(
-			"arn:aws:ecs:%s:%s:task-definition/%s:1",
+			"arn:aws:ecs:%s:%s:task-definition/%s-%s:1",
 			config.Resources.Region,
 			config.Resources.AwsAccountId,
+			config.SkPrefix,
 			DefaultEcsTaskName,
 		),
 	}
+}
+
+func addSkPrefix(config *configs.Config, name string) string {
+	return config.SkPrefix + "-" + name
 }
 
 func getEcrTag(config *configs.Config) string {

@@ -56,7 +56,7 @@ resource "aws_security_group" "public" {
       to_port          = 80
     },
   ]
-  name   = "sk-public"
+  name   = "{{.SkPrefix}}-public"
 {{- if .Vpc.Id }}
   vpc_id = var.vpc_id
 {{- else}}
@@ -64,7 +64,7 @@ resource "aws_security_group" "public" {
 {{- end}}
 
   tags = {
-    Name = "sk-PublicSecurityGroup"
+    Name = "{{.SkPrefix}}-PublicSecurityGroup"
   }
 }
 

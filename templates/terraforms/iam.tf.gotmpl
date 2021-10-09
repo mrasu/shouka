@@ -19,7 +19,7 @@ resource "aws_iam_role" "ecs_task_execution" {
     "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
   ]
   max_session_duration = 3600
-  name                 = "sk-EcsTaskExecutionRole"
+  name                 = "{{.SkPrefix}}-EcsTaskExecutionRole"
   path                 = "/"
 
   inline_policy {}
@@ -49,7 +49,7 @@ resource "aws_iam_role" "codedeploy" {
     "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS",
   ]
   max_session_duration = 3600
-  name                 = "sk-CodeDeployRole"
+  name                 = "{{.SkPrefix}}-CodeDeployRole"
   path                 = "/"
 
   inline_policy {}
