@@ -10,7 +10,11 @@ import (
 const (
 	DefaultEcrRepositoryName             = "repository"
 	DefaultEcrTagName                    = "production"
+	DefaultEcrMigrationTagName           = "migration"
+	DefaultEcsClusterName                = "cluster"
 	DefaultEcsTaskName                   = "task"
+	DefaultEcsMigrationTaskName          = "task-migration"
+	DefaultEcsServiceName                = "service"
 	DefaultCodeDeployApplicationName     = "application"
 	DefaultCodeDeployDeploymentGroupName = "deployment-group"
 )
@@ -48,11 +52,15 @@ type cloudWatchData struct {
 type ecrData struct {
 	RepositoryUrl         string
 	Tag                   string
+	MigrationTag          string
 	DefaultRepositoryName string
 }
 
 type ecsData struct {
-	DefaultTaskFamilyName string
+	DefaultClusterName             string
+	DefaultTaskFamilyName          string
+	DefaultMigrationTaskFamilyName string
+	DefaultServiceName             string
 }
 
 type iamData struct {
@@ -78,12 +86,17 @@ type vpcData struct {
 }
 
 type ghActionsData struct {
-	AwsRoleArn             string
-	AwsEcrRegistry         string
-	AwsEcrRepository       string
-	AwsEcrTag              string
-	AwsApplicationName     string
-	AwsDeploymentGroupName string
+	AwsRegion               string
+	AwsRoleArn              string
+	AwsEcrRegistry          string
+	AwsEcrRepository        string
+	AwsEcrTag               string
+	AwsEcrMigrationTag      string
+	AwsEcsClusterName       string
+	AwsEcsServiceName       string
+	AwsEcsMigrationTaskName string
+	AwsApplicationName      string
+	AwsDeploymentGroupName  string
 }
 
 type appCodeData struct {
@@ -115,10 +128,14 @@ func newResourceData(config *configs.Config) resourcesData {
 		Ecr: ecrData{
 			RepositoryUrl:         config.Resources.Ecr.RepositoryUrl,
 			Tag:                   getEcrTag(config),
+			MigrationTag:          getEcrMigrationTag(config),
 			DefaultRepositoryName: DefaultEcrRepositoryName,
 		},
 		Ecs: ecsData{
-			DefaultTaskFamilyName: DefaultEcsTaskName,
+			DefaultClusterName:             DefaultEcsClusterName,
+			DefaultTaskFamilyName:          DefaultEcsTaskName,
+			DefaultMigrationTaskFamilyName: DefaultEcsMigrationTaskName,
+			DefaultServiceName:             DefaultEcsServiceName,
 		},
 		Iam: iamData{
 			EcsTaskExecutionArn:            config.Resources.Iam.EcsTaskExecutionArn,
@@ -141,9 +158,14 @@ func newResourceData(config *configs.Config) resourcesData {
 
 func newGhActionsData(config *configs.Config) ghActionsData {
 	data := ghActionsData{
-		AwsEcrTag:              getEcrTag(config),
-		AwsApplicationName:     addSkPrefix(config, DefaultCodeDeployApplicationName),
-		AwsDeploymentGroupName: addSkPrefix(config, DefaultCodeDeployDeploymentGroupName),
+		AwsRegion:               config.Resources.Region,
+		AwsEcrTag:               getEcrTag(config),
+		AwsEcrMigrationTag:      getEcrMigrationTag(config),
+		AwsEcsClusterName:       addSkPrefix(config, DefaultEcsClusterName),
+		AwsEcsServiceName:       addSkPrefix(config, DefaultEcsServiceName),
+		AwsEcsMigrationTaskName: addSkPrefix(config, DefaultEcsMigrationTaskName),
+		AwsApplicationName:      addSkPrefix(config, DefaultCodeDeployApplicationName),
+		AwsDeploymentGroupName:  addSkPrefix(config, DefaultCodeDeployDeploymentGroupName),
 	}
 
 	if config.Resources.Iam.GithubActionsArn == "" && config.Resources.AwsAccountId != "" {
@@ -193,5 +215,13 @@ func getEcrTag(config *configs.Config) string {
 		return DefaultEcrTagName
 	} else {
 		return config.Resources.Ecr.Tag
+	}
+}
+
+func getEcrMigrationTag(config *configs.Config) string {
+	if config.Resources.Ecr.MigrationTag == "" {
+		return DefaultEcrMigrationTagName
+	} else {
+		return config.Resources.Ecr.MigrationTag
 	}
 }

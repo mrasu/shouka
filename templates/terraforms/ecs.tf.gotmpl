@@ -3,7 +3,7 @@ resource "aws_ecs_cluster" "cluster" {
     "FARGATE",
     "FARGATE_SPOT",
   ]
-  name = "{{.SkPrefix}}-cluster"
+  name = "{{.SkPrefix}}-{{.Ecs.DefaultClusterName}}"
 
   setting {
     name  = "containerInsights"
@@ -72,6 +72,66 @@ resource "aws_ecs_task_definition" "run_server" {
   tags = {}
 }
 
+resource "aws_ecs_task_definition" "run_migration" {
+  container_definitions = jsonencode(
+    [
+      {
+        command     = ["./server", "migrate"]
+        cpu         = 0
+        environment = []
+        essential   = true
+      {{- if and .Ecr.RepositoryUrl }}
+        image       = var.ecr_image
+      {{- else }}
+        image       = "${aws_ecr_repository.ecr_repository.repository_url}:{{.Ecr.MigrationTag}}"
+      {{- end }}
+        logConfiguration = {
+          logDriver = "awslogs"
+          options = {
+          {{- if .CloudWatch.GroupName }}
+            awslogs-group = var.cloud_watch_log_group_name
+          {{- else}}
+            awslogs-group = aws_cloudwatch_log_group.ecs_logs.name
+          {{- end}}
+
+            awslogs-region        = var.aws_region
+            awslogs-stream-prefix = "ecs"
+          }
+        }
+        mountPoints = []
+        name        = "{{.SkPrefix}}-container"
+        portMappings = [
+          {
+            containerPort = 80
+            hostPort      = 80
+            protocol      = "tcp"
+          },
+        ]
+        volumesFrom = []
+      },
+    ]
+  )
+  cpu                = "256"
+{{- if .Iam.EcsTaskExecutionArn }}
+  execution_role_arn = var.iam_role_ecs_task_execution_arn
+{{- else}}
+  execution_role_arn = aws_iam_role.ecs_task_execution.arn
+{{- end}}
+  family             = "{{.SkPrefix}}-{{.Ecs.DefaultMigrationTaskFamilyName}}"
+  memory             = "512"
+  network_mode       = "awsvpc"
+  requires_compatibilities = [
+    "FARGATE",
+  ]
+{{- if .Iam.EcsTaskExecutionArn }}
+  task_role_arn = var.iam_role_ecs_task_execution_arn
+{{- else}}
+  task_role_arn = aws_iam_role.ecs_task_execution.arn
+{{- end}}
+
+  tags = {}
+}
+
 resource "aws_ecs_service" "http_servers" {
   cluster                            = aws_ecs_cluster.cluster.arn
   deployment_maximum_percent         = 200
@@ -81,7 +141,7 @@ resource "aws_ecs_service" "http_servers" {
   enable_execute_command             = false
   health_check_grace_period_seconds  = 0
   launch_type                        = "FARGATE"
-  name                               = "{{.SkPrefix}}-service"
+  name                               = "{{.SkPrefix}}-{{.Ecs.DefaultServiceName}}"
   platform_version                   = "1.4.0"
   task_definition                    = aws_ecs_task_definition.run_server.arn
 

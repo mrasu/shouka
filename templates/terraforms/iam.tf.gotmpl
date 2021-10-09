@@ -102,7 +102,8 @@ resource "aws_iam_role" "github_actions" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AWSCodeDeployDeployerAccess",
     "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS",
-    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser",
+    "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
   ]
   max_session_duration = 3600
   name                 = "GitHubActionRole"

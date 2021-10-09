@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/login_aws
         with:
-          region: "ap-northeast-1"
+          region: "{{.AwsRegion}}"
         {{- if .AwsRoleArn }}
           role_arn: "{{.AwsRoleArn}}"
         {{- else }}
@@ -37,7 +37,7 @@ jobs:
         {{- end }}
       - uses: ./.github/actions/login_ecr
         with:
-          region: "ap-northeast-1"
+          region: "{{.AwsRegion}}"
         {{- if .AwsEcrRegistry }}
           server: "{{.AwsEcrRegistry}}"
         {{- else }}
@@ -68,7 +68,7 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
-  deploy:
+  migrate:
     runs-on: ubuntu-latest
     needs: build
     permissions:
@@ -78,7 +78,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/login_aws
         with:
-          region: "ap-northeast-1"
+          region: "{{.AwsRegion}}"
         {{- if .AwsRoleArn }}
           role_arn: "{{.AwsRoleArn}}"
         {{- else }}
@@ -89,7 +89,7 @@ jobs:
         {{- end }}
       - uses: ./.github/actions/login_ecr
         with:
-          region: "ap-northeast-1"
+          region: "{{.AwsRegion}}"
         {{- if .AwsEcrRegistry }}
           server: "{{.AwsEcrRegistry}}"
         {{- else }}
@@ -98,14 +98,85 @@ jobs:
           # e.g. server: "xxxx.dkr.ecr.us-east-1.amazonaws.com"
           server:
         {{- end }}
-      - name: Add "production" tag to pushed image
+      - uses: ./.github/actions/add_tag_to_ecr_image
+        with:
+        {{- if .AwsEcrRepository }}
+          ecr_repository: "{{.AwsEcrRepository}}"
+        {{- else }}
+          # **SK-CHANGE-REQUIRED**
+          # Add Repository for ECR putting your image
+          # e.g. ecr_repository: "sk-repository"
+          ecr_repository:
+        {{- end }}
+          existing_tag: ${{"{{"}} github.sha {{"}}"}}
+          new_tag: "{{.AwsEcrMigrationTag}}"
+      - name: Run migration
         env:
-          ECR_REPOSITORY: "sk-repository"
-          RELEASE_TAG: "{{.AwsEcrTag}}"
-          IMAGE_TAG: ${{"{{"}} github.sha {{"}}"}}
+          SERVICE_NAME: "{{.AwsEcsServiceName}}"
+          CLUSTER_NAME: "{{.AwsEcsClusterName}}"
+          # **SK-CHANGE-REQUIRED**
+          # Add Name for migration task
+          # e.g. TASK_DEFINITION: "{{.AwsEcsMigrationTaskName}}:1"
+          TASK_DEFINITION:
         run: |
-          MANIFEST=$(aws ecr batch-get-image --repository-name $ECR_REPOSITORY --image-ids imageTag=$IMAGE_TAG --query 'images[].imageManifest' --output text)
-          aws ecr put-image --repository-name sk-repository --image-tag $RELEASE_TAG --image-manifest "$MANIFEST"
+          aws ecs describe-services --services $SERVICE_NAME --cluster $CLUSTER_NAME > __tmp_services.json
+
+          echo '{"cluster": "'"${CLUSTER_NAME}"'", "count": 1, "launchType": "FARGATE", "networkConfiguration": {}, "taskDefinition": "'"${TASK_DEFINITION}"'"}' | jq -M --argfile gs __tmp_services.json '.networkConfiguration *= $gs.services[0].networkConfiguration' > __tmp_task_input.json
+
+          aws ecs run-task --cli-input-json file://__tmp_task_input.json > __tmp_task.json
+
+          task_arn=$(jq -r .tasks[0].taskArn ./__tmp_task.json)
+          echo "Running task....      ${task_arn}"
+
+          aws ecs wait tasks-stopped --cluster ${CLUSTER_NAME} --tasks $task_arn
+
+          exitCode=$(aws ecs describe-tasks --cluster ${CLUSTER_NAME} --tasks $task_arn | jq .tasks[0].containers[0].exitCode)
+          echo "Task stopped with exitCode: ${exitCode}"
+
+          rm __tmp_*
+          exit $exitCode
+  deploy:
+    runs-on: ubuntu-latest
+    needs: migrate
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/login_aws
+        with:
+          region: "{{.AwsRegion}}"
+        {{- if .AwsRoleArn }}
+          role_arn: "{{.AwsRoleArn}}"
+        {{- else }}
+          # **SK-CHANGE-REQUIRED**
+          # Add ARN for IAM role to connect GitHub Actions by OpenId Connect
+          # e.g. role_arn: "arn:aws:iam::xxxxxx:role/GitHubActionRole"
+          role_arn: "{{.AwsRoleArn}}"
+        {{- end }}
+      - uses: ./.github/actions/login_ecr
+        with:
+          region: "{{.AwsRegion}}"
+        {{- if .AwsEcrRegistry }}
+          server: "{{.AwsEcrRegistry}}"
+        {{- else }}
+          # **SK-CHANGE-REQUIRED**
+          # Add Domain for ECR's Registry putting your image
+          # e.g. server: "xxxx.dkr.ecr.us-east-1.amazonaws.com"
+          server:
+        {{- end }}
+      - uses: ./.github/actions/add_tag_to_ecr_image
+        with:
+        {{- if .AwsEcrRepository }}
+          ecr_repository: "{{.AwsEcrRepository}}"
+        {{- else }}
+          # **SK-CHANGE-REQUIRED**
+          # Add Repository for ECR putting your image
+          # e.g. ecr_repository: "sk-repository"
+          ecr_repository:
+        {{- end }}
+          existing_tag: ${{"{{"}} github.sha {{"}}"}}
+          new_tag: "{{.AwsEcrTag}}"
       - env:
           APPLICATION_NAME: "{{.AwsApplicationName}}"
           DEPLOYMENT_GROUP_NAME: "{{.AwsDeploymentGroupName}}"

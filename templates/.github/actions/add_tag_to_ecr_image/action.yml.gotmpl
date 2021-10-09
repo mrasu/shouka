@@ -1,0 +1,20 @@
+name: "Add tag to image"
+description: "Add tag to AWS ECR image"
+inputs:
+  ecr_repository:
+    required: true
+    description: "Repository of ECR"
+  existing_tag:
+    required: true
+    description: "Tag to find your image"
+  new_tag:
+    required: true
+    description: "Tag you want to add"
+runs:
+  using: "composite"
+  steps:
+    - name: Add tag to existing image
+      run: |
+        MANIFEST=$(aws ecr batch-get-image --repository-name ${{"{{"}}inputs.ecr_repository{{"}}"}} --image-ids imageTag=${{"{{"}}inputs.existing_tag{{"}}"}} --query 'images[].imageManifest' --output text)
+        aws ecr put-image --repository-name ${{"{{"}}inputs.ecr_repository{{"}}"}} --image-tag ${{"{{"}}inputs.new_tag{{"}}"}} --image-manifest "$MANIFEST"
+      shell: bash

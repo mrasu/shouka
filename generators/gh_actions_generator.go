@@ -25,6 +25,7 @@ func (gag *GhActionsGenerator) Generate(data *data) error {
 	files := []string{
 		"workflows/test.yml",
 		"workflows/release.yml",
+		"actions/add_tag_to_ecr_image/action.yml",
 		"actions/login_aws/action.yml",
 		"actions/login_ecr/action.yml",
 	}

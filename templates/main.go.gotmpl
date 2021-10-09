@@ -4,12 +4,33 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
 var builtAt = "unknown"
 
 func main() {
+	if len(os.Args) != 2 {
+		log.Fatal("require arguments")
+	}
+
+	arg := os.Args[1]
+	switch arg {
+	case "migrate":
+		runMigration()
+	case "start":
+		log.Fatal(startServer())
+	default:
+		log.Fatal(fmt.Sprintf("invalid command: %s\n", arg))
+	}
+}
+
+func runMigration() {
+	fmt.Println("Run something for migration...")
+}
+
+func startServer() error {
 	startTime := time.Now()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +46,7 @@ func main() {
 
 	port := ":80"
 	log.Println("Running at " + port)
-	log.Fatal(http.ListenAndServe(port, nil))
+	return http.ListenAndServe(port, nil)
 }
 
 func formatTime(t time.Time) string {

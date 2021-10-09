@@ -5,6 +5,7 @@ import "strings"
 type EcrConfig struct {
 	RepositoryUrl string `json:"repository_url"`
 	Tag           string `json:"tag"`
+	MigrationTag  string `json:"migration_tag"`
 }
 
 func (ec *EcrConfig) RequiresTemplate() bool {
