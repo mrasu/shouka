@@ -9,7 +9,6 @@ import (
 type Generator struct {
 	file   *file
 	config *configs.Config
-	data   *data
 }
 
 func NewGenerator(fs *embed.FS, config *configs.Config) *Generator {

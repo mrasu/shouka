@@ -144,9 +144,7 @@ func (ri *resourceInput) askExistingResources() (map[string]struct{}, error) {
 				return nil, errors.Wrap(err, "failed to get resourceAnswer for more resources")
 			}
 
-			for _, r := range moreResources {
-				resources = append(resources, r)
-			}
+			resources = append(resources, moreResources...)
 		}
 	}
 
