@@ -28,6 +28,7 @@ func main() {
 	//*/
 }
 
+//nolint:deadcode,unused
 func runDummy() {
 	cnf := &configs.Config{
 		// Directory: fmt.Sprintf("tmp/tmp_terraform_%s", time.Now().Format("20060102150405")),

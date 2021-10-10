@@ -2,7 +2,6 @@ package generators
 
 import (
 	"path"
-	"text/template"
 
 	"github.com/mrasu/shouka/configs"
 )
@@ -115,10 +114,6 @@ func (tg *TfGenerator) writeResourceFile(resource string, data *data) error {
 	}
 
 	return nil
-}
-
-func (tg *TfGenerator) load(name string) (*template.Template, error) {
-	return tg.file.load("templates/terraforms", name)
 }
 
 func (tg *TfGenerator) writeFile(name string, bytes []byte) error {
