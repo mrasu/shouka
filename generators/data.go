@@ -19,7 +19,7 @@ const (
 	DefaultCodeDeployDeploymentGroupName = "deployment-group"
 )
 
-type data struct {
+type Data struct {
 	Resources resourcesData
 	ghActions ghActionsData
 	appCode   appCodeData
@@ -104,8 +104,8 @@ type appCodeData struct {
 	AwsTaskDefinitionExample string
 }
 
-func newData(config *configs.Config) *data {
-	return &data{
+func NewData(config *configs.Config) *Data {
+	return &Data{
 		Resources: newResourceData(config),
 		ghActions: newGhActionsData(config),
 		appCode:   newAppCodeData(config),

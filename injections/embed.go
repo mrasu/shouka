@@ -1,5 +1,7 @@
 package injections
 
-import "embed"
+import (
+	"io/fs"
+)
 
-var EmbedFs *embed.FS
+var EmbedFs fs.ReadFileFS

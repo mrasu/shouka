@@ -2,26 +2,25 @@ package generators
 
 import (
 	"github.com/mrasu/shouka/configs"
+	"github.com/mrasu/shouka/generators/templates"
 )
 
 type AppCodeGenerator struct {
-	file   *file
-	config *configs.Config
+	file *templates.FileSystem
 
 	outputDir string
 }
 
-func NewAppCodeGenerator(file *file, config *configs.Config) *AppCodeGenerator {
+func NewAppCodeGenerator(file *templates.FileSystem, config *configs.Config) *AppCodeGenerator {
 	return &AppCodeGenerator{
-		file:   file,
-		config: config,
+		file: file,
 
 		outputDir: config.Directory,
 	}
 }
 
-func (acg *AppCodeGenerator) Generate(data *data) error {
-	files := []string{
+func (acg *AppCodeGenerator) Generate(data *Data) error {
+	filenames := []string{
 		".dockerignore",
 		".gitignore",
 		"appspec.yml",
@@ -31,7 +30,7 @@ func (acg *AppCodeGenerator) Generate(data *data) error {
 		"main_test.go",
 	}
 
-	for _, f := range files {
+	for _, f := range filenames {
 		if err := acg.writeTemplateFile(f, data); err != nil {
 			return err
 		}
@@ -40,8 +39,8 @@ func (acg *AppCodeGenerator) Generate(data *data) error {
 	return nil
 }
 
-func (acg *AppCodeGenerator) writeTemplateFile(file string, data *data) error {
-	writer, err := acg.file.loadTemplate("templates", file+".gotmpl", data.appCode)
+func (acg *AppCodeGenerator) writeTemplateFile(file string, data *Data) error {
+	writer, err := acg.file.LoadTemplate("templates", file+".gotmpl", data.appCode)
 	if err != nil {
 		return err
 	}
@@ -54,5 +53,5 @@ func (acg *AppCodeGenerator) writeTemplateFile(file string, data *data) error {
 }
 
 func (acg *AppCodeGenerator) writeFile(name string, bytes []byte) error {
-	return acg.file.writeFile(acg.outputDir, name, bytes)
+	return acg.file.WriteFile(acg.outputDir, name, bytes)
 }

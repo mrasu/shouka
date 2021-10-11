@@ -13,5 +13,8 @@ type IamConfig struct {
 }
 
 func (ic *IamConfig) RequiresTemplate() bool {
-	return ic.EcsTaskExecutionArn == "" || ic.CodedeployArn == ""
+	return ic.EcsTaskExecutionArn == "" ||
+		ic.CodedeployArn == "" ||
+		ic.GithubActionsArn == "" ||
+		ic.GithubActionsOpenidProviderArn == ""
 }
