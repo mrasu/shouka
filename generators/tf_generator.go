@@ -3,17 +3,19 @@ package generators
 import (
 	"path"
 
+	"github.com/mrasu/shouka/generators/templates"
+
 	"github.com/mrasu/shouka/configs"
 )
 
 type TfGenerator struct {
-	file   *file
+	file   *templates.FileSystem
 	config *configs.Config
 
 	outputDir string
 }
 
-func NewTfGenerator(file *file, config *configs.Config) *TfGenerator {
+func NewTfGenerator(file *templates.FileSystem, config *configs.Config) *TfGenerator {
 	return &TfGenerator{
 		file:   file,
 		config: config,
@@ -22,7 +24,7 @@ func NewTfGenerator(file *file, config *configs.Config) *TfGenerator {
 	}
 }
 
-func (tg *TfGenerator) Generate(data *data) error {
+func (tg *TfGenerator) Generate(data *Data) error {
 	if err := ensureDirectoryExistence(tg.outputDir); err != nil {
 		return err
 	}
@@ -90,8 +92,8 @@ func (tg *TfGenerator) Generate(data *data) error {
 	return nil
 }
 
-func (tg *TfGenerator) writeTemplateFile(filename string, data *data) error {
-	writer, err := tg.file.loadTemplate("templates/terraforms", filename+".gotmpl", data)
+func (tg *TfGenerator) writeTemplateFile(filename string, data *Data) error {
+	writer, err := tg.file.LoadTemplate("templates/terraforms", filename+".gotmpl", data.Resources)
 	if err != nil {
 		return err
 	}
@@ -103,19 +105,10 @@ func (tg *TfGenerator) writeTemplateFile(filename string, data *data) error {
 	return nil
 }
 
-func (tg *TfGenerator) writeResourceFile(resource string, data *data) error {
-	writer, err := tg.file.loadTemplate("templates/terraforms", resource+".tf.gotmpl", data.Resources)
-	if err != nil {
-		return err
-	}
-
-	if err := tg.writeFile(resource+".tf", writer.Bytes()); err != nil {
-		return err
-	}
-
-	return nil
+func (tg *TfGenerator) writeResourceFile(resource string, data *Data) error {
+	return tg.writeTemplateFile(resource+".tf", data)
 }
 
 func (tg *TfGenerator) writeFile(name string, bytes []byte) error {
-	return tg.file.writeFile(tg.outputDir, name, bytes)
+	return tg.file.WriteFile(tg.outputDir, name, bytes)
 }

@@ -1,19 +1,21 @@
 package generators
 
 import (
-	"embed"
+	"io/fs"
+
+	"github.com/mrasu/shouka/generators/templates"
 
 	"github.com/mrasu/shouka/configs"
 )
 
 type Generator struct {
-	file   *file
+	file   *templates.FileSystem
 	config *configs.Config
 }
 
-func NewGenerator(fs *embed.FS, config *configs.Config) *Generator {
+func NewGenerator(fs fs.ReadFileFS, config *configs.Config) *Generator {
 	return &Generator{
-		file:   newFile(fs),
+		file:   templates.NewFileSystem(fs),
 		config: config,
 	}
 }
@@ -23,7 +25,7 @@ func (g *Generator) Generate() error {
 		return err
 	}
 
-	data := newData(g.config)
+	data := NewData(g.config)
 
 	if err := NewAppCodeGenerator(g.file, g.config).Generate(data); err != nil {
 		return err
