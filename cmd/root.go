@@ -1,6 +1,9 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/mrasu/shouka/libs/log"
+	"github.com/spf13/cobra"
+)
 
 var rootCmd = &cobra.Command{
 	Use:   "shouka",
@@ -10,6 +13,18 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+var verbose bool
+
 func Execute() error {
+	cobra.OnInitialize(initialize)
+
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
+
 	return rootCmd.Execute()
+}
+
+func initialize() {
+	if verbose {
+		log.SetLevel(log.Debug)
+	}
 }

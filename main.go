@@ -3,12 +3,11 @@ package main
 import (
 	"embed"
 	"encoding/json"
-	"fmt"
-	"log"
 
 	"github.com/mrasu/shouka/cmd"
 	"github.com/mrasu/shouka/configs"
 	"github.com/mrasu/shouka/injections"
+	"github.com/mrasu/shouka/libs/log"
 )
 
 // Embed subdirectories explicitly to include hidden files like .gitignore.gotmpl
@@ -23,7 +22,7 @@ func main() {
 
 	//*
 	if err := cmd.Execute(); err != nil {
-		log.Fatalf("%+v", err)
+		log.Fatalf("Error happens. error: %+v", err)
 	}
 	//*/
 }
@@ -68,12 +67,12 @@ func runDummy() {
 		},
 	}
 
-	fmt.Println(cnf)
+	log.Println(cnf)
 	data, err := json.Marshal(cnf)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s\n", string(data))
+	log.Printf("%s\n", string(data))
 
 	v := configs.Config{}
 	err = json.Unmarshal(data, &v)
@@ -81,5 +80,5 @@ func runDummy() {
 		panic(err)
 	}
 
-	fmt.Println(&v)
+	log.Println(&v)
 }

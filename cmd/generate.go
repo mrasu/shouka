@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/mrasu/shouka/libs/log"
+
 	"github.com/pkg/errors"
 
 	"github.com/mrasu/shouka/configs"
@@ -43,6 +45,9 @@ func init() {
 
 func generate() error {
 	printAsciiBanner()
+	log.Debugln("Running `generate`")
+	log.Debugf("jsonFilePath: %s\n", jsonFilePath)
+	log.Debugf("outputPath: %s\n", outputPath)
 
 	cnf, err := getConfig()
 	if err != nil {
@@ -72,7 +77,7 @@ func generate() error {
 		// Ignore error as getting absolute path is just for usability
 		path = cnf.Directory
 	}
-	fmt.Printf("Successfully generated files at %s\n", path)
+	log.Printf("Successfully generated files at %s\n", path)
 	return nil
 }
 
@@ -89,7 +94,7 @@ const banner = `
                                                       `
 
 func printAsciiBanner() {
-	fmt.Println(banner)
+	log.Println(banner)
 }
 
 func getConfig() (*configs.Config, error) {
