@@ -1,0 +1,44 @@
+# TL;DR
+{{.Tldr}}
+# What you should do to set up
+
+1. Run terraform
+    ```shell
+    cd terraforms
+    terraform init
+    terraform apply
+    ```
+2. Add words at `%%SK-CHANGE-REQUIRED%%`<br>
+    Because some files depend on resources made by terraform, you need to fill with the information of them.<br>
+    You can find files by
+    ```shell
+    grep --exclude-dir=docs -n -A 5 -R "%%SK-CHANGE-REQUIRED%%" .
+    ```
+3.  Push to GitHub
+    ```shell
+    git add -A
+    git commit
+    git push origin main
+    ```
+4. Wait GitHub Actions
+5. You will see new response from ECS through ALB
+
+
+# What is this
+
+This code uses AWS ECS with Fargate and GitHub Actions.<br>
+The notable features are,
+
+1. GtiHub Actions handles all steps for deployment (test, build, deploy)
+2. ECS runs a Docker image tagged with a specified name.
+3. You can access ECS through ALB.
+
+Detail steps for deployment are,
+1. GitHub Actions run tests.
+2. GitHub Actions build Docker image.
+3. GitHub Actions push the image to AWS ECR
+4. GitHub Actions run one ECS task before deploy.<br>
+    The task is not always necessary, but you may use in your environment too.
+5. GitHub Actions run CodeDeploy.
+6. CodeDeploy replaces ECS servers to use new built image.
+7. After waiting for CodeDeploy, you can get changed response from ECS through ALB.

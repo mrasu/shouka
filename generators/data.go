@@ -23,6 +23,7 @@ type Data struct {
 	Resources resourcesData
 	ghActions ghActionsData
 	appCode   appCodeData
+	docs      docsData
 }
 
 type resourcesData struct {
@@ -104,11 +105,16 @@ type appCodeData struct {
 	AwsTaskDefinitionExample string
 }
 
+type docsData struct {
+	tldr Combination
+}
+
 func NewData(config *configs.Config) *Data {
 	return &Data{
 		Resources: newResourceData(config),
 		ghActions: newGhActionsData(config),
 		appCode:   newAppCodeData(config),
+		docs:      newDocsData(),
 	}
 }
 
@@ -199,6 +205,12 @@ func newAppCodeData(config *configs.Config) appCodeData {
 			config.SkPrefix,
 			DefaultEcsTaskName,
 		),
+	}
+}
+
+func newDocsData() docsData {
+	return docsData{
+		tldr: FargateGithubActions,
 	}
 }
 

@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -22,9 +21,10 @@ func TestCodeGenerator_Generate(t *testing.T) {
 
 	tg := prepareGenerator(t, tmpDir)
 
-	assert.NoError(t, tg.Generate())
+	_, err = tg.Generate()
+	assert.NoError(t, err)
 
-	expectedFiles := excludeDirs(listTemplateFiles(t, ""), []string{"docs"})
+	expectedFiles := listTemplateFiles(t, "")
 
 	actualFiles := listFiles(t, tmpDir)
 	assert.ElementsMatch(t, expectedFiles, actualFiles)
@@ -40,24 +40,6 @@ func prepareGenerator(t *testing.T, dir string) *generators.Generator {
 	tg := generators.NewGenerator(&dummyFs{}, config)
 
 	return tg
-}
-
-func excludeDirs(files, exDirs []string) []string {
-	var res []string
-	for _, f := range files {
-		match := false
-		for _, d := range exDirs {
-			if strings.HasPrefix(f, d+"/") {
-				match = true
-				break
-			}
-		}
-		if !match {
-			res = append(res, f)
-		}
-	}
-
-	return res
 }
 
 type dummyFs struct{}

@@ -25,6 +25,7 @@ func (acg *AppCodeGenerator) Generate(data *Data) error {
 		".gitignore",
 		"appspec.yml",
 		"Dockerfile",
+		"README.md",
 		"go.mod",
 		"main.go",
 		"main_test.go",

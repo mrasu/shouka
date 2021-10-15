@@ -20,24 +20,29 @@ func NewGenerator(fs fs.ReadFileFS, config *configs.Config) *Generator {
 	}
 }
 
-func (g *Generator) Generate() error {
+func (g *Generator) Generate() (string, error) {
 	if err := ensureDirectoryExistence(g.config.Directory); err != nil {
-		return err
+		return "", err
 	}
 
 	data := NewData(g.config)
 
 	if err := NewAppCodeGenerator(g.file, g.config).Generate(data); err != nil {
-		return err
+		return "", err
 	}
 
 	if err := NewTfGenerator(g.file, g.config).Generate(data); err != nil {
-		return err
+		return "", err
 	}
 
 	if err := NewGhActionsGenerator(g.file, g.config).Generate(data); err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	msg, err := NewDocsGenerator(g.file, g.config).Generate(data)
+	if err != nil {
+		return "", err
+	}
+
+	return msg, nil
 }

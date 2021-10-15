@@ -68,7 +68,8 @@ func generate() error {
 	// 	panic(err)
 	// }
 	g := generators.NewGenerator(injections.EmbedFs, cnf)
-	if err := g.Generate(); err != nil {
+	msg, err := g.Generate()
+	if err != nil {
 		return err
 	}
 
@@ -77,7 +78,8 @@ func generate() error {
 		// Ignore error as getting absolute path is just for usability
 		path = cnf.Directory
 	}
-	log.Printf("Successfully generated files at %s\n", path)
+	log.Printf("\x1b[32mSuccess!\x1b[0m generated at %s\n\n", path)
+	log.Println(msg)
 	return nil
 }
 

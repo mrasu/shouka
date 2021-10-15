@@ -30,7 +30,7 @@ jobs:
         {{- if .AwsRoleArn }}
           role_arn: "{{.AwsRoleArn}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add ARN for IAM role to connect GitHub Actions by OpenId Connect
           # e.g. role_arn: "arn:aws:iam::xxxxxx:role/GitHubActionRole"
           role_arn: "{{.AwsRoleArn}}"
@@ -41,7 +41,7 @@ jobs:
         {{- if .AwsEcrRegistry }}
           server: "{{.AwsEcrRegistry}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add Domain for ECR's Registry putting your image
           # e.g. server: "xxxx.dkr.ecr.us-east-1.amazonaws.com"
           server:
@@ -51,7 +51,7 @@ jobs:
         {{- if .AwsEcrRegistry }}
           ECR_REGISTRY: "{{.AwsEcrRegistry}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add Domain for ECR's Registry putting your image
           # e.g. ECR_REGISTRY: "xxxx.dkr.ecr.us-east-1.amazonaws.com"
           ECR_REGISTRY:
@@ -59,7 +59,7 @@ jobs:
         {{- if .AwsEcrRepository }}
           ECR_REPOSITORY: "{{.AwsEcrRepository}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add Repository for ECR putting your image
           # e.g. ECR_REPOSITORY: "sk-repository"
           ECR_REPOSITORY:
@@ -82,7 +82,7 @@ jobs:
         {{- if .AwsRoleArn }}
           role_arn: "{{.AwsRoleArn}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add ARN for IAM role to connect GitHub Actions by OpenId Connect
           # e.g. role_arn: "arn:aws:iam::xxxxxx:role/GitHubActionRole"
           role_arn: "{{.AwsRoleArn}}"
@@ -93,7 +93,7 @@ jobs:
         {{- if .AwsEcrRegistry }}
           server: "{{.AwsEcrRegistry}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add Domain for ECR's Registry putting your image
           # e.g. server: "xxxx.dkr.ecr.us-east-1.amazonaws.com"
           server:
@@ -103,7 +103,7 @@ jobs:
         {{- if .AwsEcrRepository }}
           ecr_repository: "{{.AwsEcrRepository}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add Repository for ECR putting your image
           # e.g. ecr_repository: "sk-repository"
           ecr_repository:
@@ -114,7 +114,7 @@ jobs:
         env:
           SERVICE_NAME: "{{.AwsEcsServiceName}}"
           CLUSTER_NAME: "{{.AwsEcsClusterName}}"
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add Name for migration task
           # e.g. TASK_DEFINITION: "{{.AwsEcsMigrationTaskName}}:1"
           TASK_DEFINITION:
@@ -149,7 +149,7 @@ jobs:
         {{- if .AwsRoleArn }}
           role_arn: "{{.AwsRoleArn}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add ARN for IAM role to connect GitHub Actions by OpenId Connect
           # e.g. role_arn: "arn:aws:iam::xxxxxx:role/GitHubActionRole"
           role_arn: "{{.AwsRoleArn}}"
@@ -160,7 +160,7 @@ jobs:
         {{- if .AwsEcrRegistry }}
           server: "{{.AwsEcrRegistry}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add Domain for ECR's Registry putting your image
           # e.g. server: "xxxx.dkr.ecr.us-east-1.amazonaws.com"
           server:
@@ -170,7 +170,7 @@ jobs:
         {{- if .AwsEcrRepository }}
           ecr_repository: "{{.AwsEcrRepository}}"
         {{- else }}
-          # **SK-CHANGE-REQUIRED**
+          # %%SK-CHANGE-REQUIRED%%
           # Add Repository for ECR putting your image
           # e.g. ecr_repository: "sk-repository"
           ecr_repository:
